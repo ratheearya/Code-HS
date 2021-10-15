@@ -1,0 +1,77 @@
+var NUM_ROW=30;
+var NUM_COL=30;
+var HEIGHT=getHeight()/NUM_ROW;
+var WIDTH=getWidth()/NUM_COL;
+var GRID=new Grid(NUM_ROW,NUM_COL);
+var GRID2=new Grid(NUM_ROW,NUM_COL);
+var LIFE_PROB=0.4;
+var STATUS=false;
+function start(){
+	createBoard();
+	setTimer(startGame, 40);
+}
+function createBoard(){
+    for(var i=0;i<NUM_ROW;i++){
+        for(var j=0;j<NUM_COL;j++){
+            GRID.set(i,j,Randomizer.nextBoolean(LIFE_PROB));
+        }
+        editGRID();
+    }
+}
+function editGRID(){
+    removeAll();
+    for(var i=0;i<NUM_ROW;i++){
+        for(var j=0;j<NUM_COL;j++){
+            if(GRID.get(i,j)==true){
+                makeCell(i,j);
+            }
+        }
+    }
+}
+function makeCell(row,col){
+    var cell=new Rectangle(WIDTH,HEIGHT);
+    cell.setPosition(col*WIDTH,row*HEIGHT);
+    add(cell);
+}
+function startGame(){
+    for(var i=0;i<NUM_ROW;i++){
+        for(var j=0;j<NUM_COL;j++){
+            var streak = checkCell(i,j);
+            changeCells(i,j,streak);
+        }
+    }
+    gen1();
+}
+function checkCell(row,col){
+    var streak=0;
+    for(var i=-1;i<=1;i++){
+        for(var j=-1;j<=1;j++){
+            if(i!=0 || j!=0){
+                if(GRID.inBounds(row+i,col+j)==true){
+                    if(GRID.get(row+i,col+j)==true){
+                        streak++;
+                    }
+                }
+            }
+        }
+    }
+    return streak;
+}
+function changeCells(row,col,streak){
+    if(streak >= 4){
+        GRID2.set(row,col,false);
+    }
+    if(streak == 3){
+        GRID2.set(row,col,true);
+    }
+    if(streak == 2){
+        GRID2.set(row,col,GRID.get(row,col));
+    }
+    if(streak < 2){
+        GRID2.set(row,col,false);
+    }
+}
+function gen1(){
+    GRID=GRID2;
+    editGRID();
+}
